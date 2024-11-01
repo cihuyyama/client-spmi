@@ -1,1 +1,1 @@
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+export const BASE_URL = "https://spmi-api.iqbalalhabib.com/api/v1";
