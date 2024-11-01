@@ -49,7 +49,7 @@ const AuthPage = () => {
                 {
                     loading: 'Logging in...',
                     success: async (response) => {
-                        await router.push('/dashboard');
+                        router.push('/dashboard');
                         return 'Logged in successfully';
                     },
                     error: 'Error logging in'
@@ -81,7 +81,7 @@ const AuthPage = () => {
                 status = response.status
                 if (status === 200) {
                     toast.info('You are already logged in');
-                    await router.push('/dashboard');
+                    router.push('/dashboard');
                 }
                 return status;
             } catch (error) {
