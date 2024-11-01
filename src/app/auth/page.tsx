@@ -49,7 +49,7 @@ const AuthPage = () => {
                 {
                     loading: 'Logging in...',
                     success: async (response) => {
-                        router.push('/dashboard');
+                        window.location.href = '/dashboard';
                         return 'Logged in successfully';
                     },
                     error: 'Error logging in'
