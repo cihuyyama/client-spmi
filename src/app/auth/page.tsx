@@ -49,7 +49,7 @@ const AuthPage = () => {
                 {
                     loading: 'Logging in...',
                     success: async (response) => {
-                        window.location.href = '/dashboard';
+                        router.push('/dashboard');
                         return 'Logged in successfully';
                     },
                     error: 'Error logging in'
@@ -78,11 +78,10 @@ const AuthPage = () => {
                     withCredentials: true
                 })
 
-                console.log(response.data)
                 status = response.status
                 if (status === 200) {
-                    window.location.href = '/dashboard';
                     toast.info('You are already logged in');
+                    router.push('/dashboard');
                 }
                 return status;
             } catch (error) {
@@ -91,7 +90,7 @@ const AuthPage = () => {
         };
 
         fetchData();
-    }, []);
+    }, [router]);
     return (
         <section className="min-h-screen flex items-center justify-center bg-slate-50">
             <div className="bg-white flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
