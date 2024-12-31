@@ -14,23 +14,20 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import ReactSelect from 'react-select'
 import { toast } from "sonner";
 import axios from "axios";
 import { BASE_URL } from "@/constant/BaseURL";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Indicator, MataAnggaran, Rekening, SubUnit, Unit } from "@/lib/types";
+import { PaguAnggaran, Rekening } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar";
 
 export default function NewPembelianContent({ id, prokerId }: { id: string, prokerId: string }) {
     const [rek, setRek] = useState<Rekening[]>([])
+    const [pagu, setPagu] = useState<PaguAnggaran>()
+    const [anggaranTerpakai, setAnggaranTerpakai] = useState<number>(0)
+    const [sisaAnggaran, setSisaAnggaran] = useState<number>(0)
     const router = useRouter();
     const formSchema = z.object({
         rekeningId: z.string({
@@ -42,8 +39,17 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
         uraian: z.string({
             required_error: "Uraian harus diisi"
         }),
-        satuan: z.string({
+        satuan: z.array(z.string(), {
             required_error: "Satuan harus diisi"
+        }),
+        jumlah: z.number({
+            required_error: "Jumlah harus diisi"
+        }),
+        nilaiSatuan: z.number({
+            required_error: "Nilai Satuan harus diisi"
+        }),
+        kuantitas: z.array(z.string(), {
+            required_error: "Kuantitas harus diisi"
         }),
     })
 
@@ -54,20 +60,27 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
             prokerId: prokerId,
             uraian: undefined,
             satuan: undefined,
+            jumlah: undefined,
+            nilaiSatuan: undefined,
+            kuantitas: undefined
         },
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             toast.promise(
-                axios.post(`${BASE_URL}/pembelian`, values, {
+                axios.post(`${BASE_URL}/pembelian`, {
+                    ...values,
+                    satuan: values.satuan.join("."),
+                    kuantitas: values.kuantitas.join("."),
+                }, {
                     withCredentials: true
                 }),
                 {
                     loading: "Menyimpan data...",
                     success: (data) => {
                         setTimeout(() => {
-                            window.location.reload()
+                            router.push(`/indicator/${id}/ma-to-indicator/${prokerId}/belanja`)
                         }, 300);
                         return `Berhasil menyimpan data`
                     },
@@ -84,20 +97,47 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
     useEffect(() => {
         const fetchDataMA = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/rekening/by-user`, {
-                    withCredentials: true
-                })
-                if (response.status === 200) {
-                    setRek(response.data.data)
+                const [rekRes, paguRes] = await Promise.all([
+                    axios.get(`${BASE_URL}/rekening`, {
+                        withCredentials: true
+                    }),
+                    axios.get(`${BASE_URL}/ma-to-indicator/${prokerId}/proker`, {
+                        withCredentials: true
+                    })
+                ])
+                if (rekRes.status === 200) {
+                    setRek(rekRes.data.data)
                 }
-                return response.data;
+                if (paguRes.status === 200) {
+                    setPagu(paguRes.data.meta.pagu);
+                    const anggaranTerpakai = paguRes.data.meta.pagu?.Pembelian?.reduce((acc: number, curr: { jumlah: string }) => acc + Number(curr.jumlah), 0) ?? 0
+                    setAnggaranTerpakai(anggaranTerpakai)
+                    setSisaAnggaran(Number(paguRes.data.meta.pagu?.pagu ?? 0) - (anggaranTerpakai ?? 0))
+                }
             } catch (error) {
                 return error;
             }
         };
 
         fetchDataMA();
-    }, [form, id])
+    }, [form, id, prokerId]);
+
+    useEffect(() => {
+        const subscription = form.watch((value, { name }) => {
+            if (name === "nilaiSatuan" || name === "kuantitas") {
+                const nilaiSatuan = value.nilaiSatuan
+                const kuantitas = value.kuantitas
+
+                if (nilaiSatuan && kuantitas) {
+                    const totalKuantitas = kuantitas.reduce((acc, curr) => acc * Number(curr ?? "1"), 1)
+                    const jumlah = nilaiSatuan * totalKuantitas
+                    form.setValue("jumlah", jumlah)
+                }
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [form])
 
     return (
         <Card className="rounded-lg border-none mt-6 w-full">
@@ -111,12 +151,12 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
                                         control={form.control}
                                         name="rekeningId"
                                         render={({ field }) => (
-                                            <FormItem className="w-fit">
+                                            <FormItem className="w-fit md:min-w-[300px]">
                                                 <FormLabel>Mata Rekening</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="rekening" />
+                                                            <SelectValue placeholder="pilih rekening" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -136,7 +176,7 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
                                     control={form.control}
                                     name="uraian"
                                     render={({ field }) => (
-                                        <FormItem className=" md:min-w-[500px] w-fit">
+                                        <FormItem className=" md:min-w-[500px] w-full">
                                             <FormLabel>Uraian</FormLabel>
                                             <FormControl>
                                                 <Textarea
@@ -150,24 +190,185 @@ export default function NewPembelianContent({ id, prokerId }: { id: string, prok
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="satuan"
-                                    render={({ field }) => (
-                                        <FormItem className=" md:min-w-[500px] w-fit">
-                                            <FormLabel>Satuan</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="satuan"
-                                                    {...field}
-                                                    value={field.value}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit">Submit</Button>
+
+                                <div className="flex flex-row w-full gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="satuan"
+                                        render={({ field }) => (
+                                            <FormItem className="w-full">
+                                                <FormLabel>Satuan</FormLabel>
+                                                <FormControl>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Input
+                                                            placeholder="Input text"
+                                                            {...field}
+                                                            value={field.value?.[0] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[0] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                        <span className="text-black">•</span>
+                                                        <Input
+                                                            placeholder="Input text"
+                                                            value={field.value?.[1] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[1] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                        <span className="text-black">•</span>
+                                                        <Input
+                                                            placeholder="Input text"
+                                                            value={field.value?.[2] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[2] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="nilaiSatuan"
+                                        render={({ field: { onChange, value, ...fieldProps } }) => (
+                                            <FormItem className="md:min-w-[500px] w-full">
+                                                <FormLabel>Nilai Satuan (Rupiah)</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        {...fieldProps}
+                                                        placeholder="nilai satuan"
+                                                        type="text"
+                                                        onChange={(e) => {
+                                                            const cleanValue = e.target.value.replace(/\D/g, '');
+                                                            const numericValue = cleanValue ? Number(cleanValue) : '';
+                                                            onChange(numericValue);
+                                                        }}
+                                                        value={
+                                                            value
+                                                                ? Number(value).toLocaleString('id-ID', {
+                                                                    maximumFractionDigits: 0,
+                                                                    useGrouping: true
+                                                                }).replace(/,/g, '.')
+                                                                : ''
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="flex flex-row w-full gap-6">
+
+                                    <FormField
+                                        control={form.control}
+                                        name="kuantitas"
+                                        render={({ field }) => (
+                                            <FormItem className="md:min-w-[500px] w-full">
+                                                <FormLabel>Kuantitas</FormLabel>
+                                                <FormControl>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Input
+                                                            placeholder="Input number"
+                                                            {...field}
+                                                            value={field.value?.[0] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[0] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                        <span className="text-black">•</span>
+                                                        <Input
+                                                            placeholder="Input number"
+                                                            value={field.value?.[1] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[1] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                        <span className="text-black">•</span>
+                                                        <Input
+                                                            placeholder="Input number"
+                                                            value={field.value?.[2] || ""}
+                                                            onChange={(e) => {
+                                                                const newValue = [...(field.value || [])];
+                                                                newValue[2] = e.target.value;
+                                                                field.onChange(newValue);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="jumlah"
+                                        render={({ field: { onChange, value, ...fieldProps } }) => (
+                                            <FormItem className="md:min-w-[500px] w-full">
+                                                <FormLabel>Jumlah (Rupiah)</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        {...fieldProps}
+                                                        disabled
+                                                        defaultValue={0}
+                                                        placeholder="jumlah"
+                                                        type="text"
+                                                        onChange={(e) => {
+                                                            const cleanValue = e.target.value.replace(/\D/g, '');
+                                                            const numericValue = cleanValue ? Number(cleanValue) : '';
+                                                            onChange(numericValue);
+                                                        }}
+                                                        value={
+                                                            value
+                                                                ? Number(value).toLocaleString('id-ID', {
+                                                                    maximumFractionDigits: 0,
+                                                                    useGrouping: true
+                                                                }).replace(/,/g, '.')
+                                                                : ''
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    <div className="pl-2 font-medium text-green-600">
+                                                        Anggaran tersedia: Rp {sisaAnggaran.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                                                    </div>
+                                                    {sisaAnggaran - Number(value) < 0 && Number(value) != 0 ? (
+                                                        <div className="text-destructive pl-2 font-medium">
+                                                            Anggaran tidak mencukupi: {`Rp ${(sisaAnggaran - Number(value)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="pl-2 font-medium text-green-600">
+                                                            Anggaran tersisa: {`Rp ${(sisaAnggaran - Number((value ?? 0))).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`}
+                                                        </div>
+                                                    )}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <Button
+                                    type="submit"
+                                    disabled={sisaAnggaran - form.watch("jumlah", 0) < 0}
+                                >
+                                    Simpan
+                                </Button>
                             </form>
                         </Form>
                     </div>

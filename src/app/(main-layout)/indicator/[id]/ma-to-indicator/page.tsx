@@ -12,7 +12,7 @@ import MAtoIndicatorContent from "@/components/dashboard-content/indikator-conte
 
 export default function MAtoIndicatorPage({ params }: { params: { id: string } }) {
   return (
-    <ContentLayout title="Penyusunan Anggaran">
+    <ContentLayout title="Penyusunan Program Kerja">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

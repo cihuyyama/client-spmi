@@ -1,14 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal } from "lucide-react"
+import { Eraser, MoreHorizontal, ShoppingBag } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import axios from "axios"
@@ -55,6 +53,14 @@ export const maColumn: ColumnDef<MatoIndicator>[] = [
         }
     },
     {
+        accessorKey: "Pembelian",
+        header: "Jumlah Anggaran (Rupiah)",
+        cell: (row) => {
+            const pembelian = row.row.original.Pembelian
+            return `${pembelian.reduce((acc, curr) => acc + curr.jumlah, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+        }
+    },
+    {
         id: "actions",
         cell: ({ row }) => {
             const matoIndicator = row.original
@@ -84,46 +90,99 @@ export const maColumn: ColumnDef<MatoIndicator>[] = [
             }
 
             return (
-                <AlertDialog>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>
-                                <Link href={`/indicator/${matoIndicator.kpiId}/ma-to-indicator/${matoIndicator.id}/belanja`} className="w-full">
-                                    Data Belanja
-                                </Link>
-                            </DropdownMenuItem>
-                            <AlertDialogTrigger className="w-full">
+                <div>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <Link href={`/indicator/${matoIndicator.kpiId}/ma-to-indicator/${matoIndicator.id}/belanja`}>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">belanja</span>
+                                        <ShoppingBag className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                            </Link>
+                            <TooltipContent>
+                                <p>Data Belanja</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <AlertDialog>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <AlertDialogTrigger>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0 text-red-500">
+                                            <span className="sr-only">belanja</span>
+                                            <Eraser className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently delete your data
+                                            and remove your data from our servers.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleDelete}>
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                                <TooltipContent>
+                                    <p>Delete Mata Anggaran Dari Indikator</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </AlertDialog>
+                    {/* <AlertDialog>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem>
-                                    Delete Mata Anggaran Dari Indikator
+                                    <Link href={`/indicator/${matoIndicator.kpiId}/ma-to-indicator/${matoIndicator.id}/belanja`} className="w-full">
+                                        Data Belanja
+                                    </Link>
                                 </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your data
-                                and remove your data from our servers.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>
-                                Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>
-                                Continue
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                                <AlertDialogTrigger className="w-full">
+                                    <DropdownMenuItem>
+                                        Delete Mata Anggaran Dari Indikator
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your data
+                                    and remove your data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>
+                                    Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDelete}>
+                                    Continue
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog> */}
+                </div>
             )
         },
     },

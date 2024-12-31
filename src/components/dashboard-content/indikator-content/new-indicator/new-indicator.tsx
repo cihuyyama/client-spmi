@@ -29,7 +29,7 @@ import axios from "axios";
 import { BASE_URL } from "@/constant/BaseURL";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bidang, SubUnit, Unit } from "@/lib/types";
+import { Bidang, Jadwal, SubUnit, Unit } from "@/lib/types";
 type OptionType = {
     value: string;
     label: string;
@@ -38,6 +38,7 @@ export default function NewIndicatorContent() {
     const [units, setUnit] = useState<Unit[]>([]);
     const [allUnits, setAllUnit] = useState<Unit[]>([]);
     const [bidang, setBidang] = useState<Bidang[]>();
+    const [jadwal, setJadwal] = useState<Jadwal[]>();
     const router = useRouter();
     const thisYear = new Date().getFullYear() + 1
     const formSchema = z.object({
@@ -90,7 +91,9 @@ export default function NewIndicatorContent() {
     function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             toast.promise(
-                axios.post(`${BASE_URL}/indicator`, values, {
+                axios.post(`${BASE_URL}/indicator`, {
+                    ...values,
+                }, {
                     withCredentials: true
                 }),
                 {
@@ -140,9 +143,24 @@ export default function NewIndicatorContent() {
                 return error;
             }
         };
+        const fetchDataJadwal = async () => {
+            try {
+
+                const response = await axios.get(`${BASE_URL}/jadwal`, {
+                    withCredentials: true
+                })
+                if (response.status === 200) {
+                    setJadwal(response.data.data)
+                }
+                return response.data;
+            } catch (error) {
+                return error;
+            }
+        };
 
         fetchDataUnit();
         fetchDataBidang();
+        fetchDataJadwal();
     }, [])
 
     return (
@@ -166,11 +184,11 @@ export default function NewIndicatorContent() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {Array.from({ length: 10 }, (_, i) => (
-                                                            <SelectItem key={i} value={String(thisYear - i)}>
-                                                                {thisYear - i}
-                                                            </SelectItem>
-                                                        ))}
+                                                        {
+                                                            Array.from({ length: 5 }, (_, i) => (
+                                                                <SelectItem key={i} value={`${thisYear - i}`}>{thisYear - i}</SelectItem>
+                                                            ))
+                                                        }
                                                     </SelectContent>
                                                 </Select>
                                                 <FormMessage />
@@ -256,9 +274,9 @@ export default function NewIndicatorContent() {
                                                     <FormLabel>Penanggung Jawab</FormLabel>
                                                     <FormControl>
                                                         <ReactSelect<OptionType, false, GroupBase<OptionType>>
-                                                            options={units?.map((unit) => ({ value: unit.id, label: unit.name }))}
-                                                            value={units.find((unit) => unit.id === field.value)
-                                                                ? { value: field.value, label: units.find((unit) => unit.id === field.value)?.name || '' }
+                                                            options={allUnits?.map((unit) => ({ value: unit.id, label: unit.name }))}
+                                                            value={allUnits.find((unit) => unit.id === field.value)
+                                                                ? { value: field.value, label: allUnits.find((unit) => unit.id === field.value)?.name || '' }
                                                                 : null}
                                                             onChange={(option) => {
                                                                 field.onChange(option?.value || '')
@@ -277,9 +295,9 @@ export default function NewIndicatorContent() {
                                                     <FormLabel>Penanggung Jawab Tambahan</FormLabel>
                                                     <FormControl>
                                                         <ReactSelect<OptionType, false, GroupBase<OptionType>>
-                                                            options={units?.map((unit) => ({ value: unit.id, label: unit.name }))}
-                                                            value={units.find((unit) => unit.id === field.value)
-                                                                ? { value: field.value || '', label: units.find((unit) => unit.id === field.value)?.name || '' }
+                                                            options={allUnits?.map((unit) => ({ value: unit.id, label: unit.name }))}
+                                                            value={allUnits.find((unit) => unit.id === field.value)
+                                                                ? { value: field.value || '', label: allUnits.find((unit) => unit.id === field.value)?.name || '' }
                                                                 : null}
                                                             onChange={(option) => field.onChange(option?.value || '')}
                                                         />

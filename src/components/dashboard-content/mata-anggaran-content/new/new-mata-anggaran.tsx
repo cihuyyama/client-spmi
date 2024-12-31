@@ -26,9 +26,6 @@ export default function NewMataAnggaranContent() {
     const [data, setIndicator] = useState<Indicator[]>();
     const router = useRouter();
     const formSchema = z.object({
-        maCode: z.string({
-            required_error: "Kode MA harus diisi"
-        }),
         name: z.string({
             required_error: "Nama MA harus diisi"
         }),
@@ -40,7 +37,6 @@ export default function NewMataAnggaranContent() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            maCode: undefined,
             name: undefined,
             indicatorId: undefined,
         },
@@ -96,35 +92,7 @@ export default function NewMataAnggaranContent() {
                     <div className="flex flex-col relative w-full">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                                <div className="flex flex-row gap-4 w-full">
-                                    <FormField
-                                        control={form.control}
-                                        name="maCode"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Kode Mata Anggaran</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="0.0" {...field} value={field.value} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
                                 <div className="w-fit md:min-w-[400px] space-y-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Nama Mata Anggaran</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="nama" {...field} value={field.value} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                     <FormField
                                         control={form.control}
                                         name="indicatorId"
@@ -138,8 +106,8 @@ export default function NewMataAnggaranContent() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {data && data.map((data: JenisRekening) => (
-                                                            <SelectItem key={data.id} value={data.id}>{data.name}</SelectItem>
+                                                        {data && data.map((data: Indicator) => (
+                                                            <SelectItem key={data.id} value={data.id}>{data.kpiCode} - {data.name}</SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -147,6 +115,20 @@ export default function NewMataAnggaranContent() {
                                             </FormItem>
                                         )}
                                     />
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Nama Mata Anggaran</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="nama" {...field} value={field.value} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
                                 </div>
                                 <Button type="submit">Submit</Button>
                             </form>

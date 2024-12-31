@@ -29,20 +29,32 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import React from "react"
+import React, { Dispatch, SetStateAction } from "react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Indicator } from "@/lib/types"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    setSelectedYear: Dispatch<SetStateAction<string | undefined>>
+    setSelectedUnit: Dispatch<SetStateAction<string>>
+    selectedYear?: string
+    selectedUnit?: string
+    indicators?: Indicator[]
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    setSelectedYear,
+    selectedYear,
+    setSelectedUnit,
+    selectedUnit,
+    indicators,
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -60,12 +72,13 @@ export function DataTable<TData, TValue>({
         }
     })
 
+    const thisYear = new Date().getFullYear()
 
     return (
         <div>
             <div className="flex flex-col w-full items-start py-4 gap-4">
                 <div className="flex flex-row w-full justify-between items-center">
-                    <div className="flex flex-col w-full">
+                    <div className="flex flex-col w-full gap-4">
                         <Input
                             placeholder="Search name..."
                             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -74,26 +87,56 @@ export function DataTable<TData, TValue>({
                             }
                             className="max-w-sm"
                         />
-                        {/* <Select
-                            defaultValue="all"
-                            onValueChange={(value) => table.getColumn("role")?.setFilterValue(value === "all" ? undefined : value)}
-                        >
-                            <SelectTrigger className="max-w-sm">
-                                <SelectValue placeholder="Filter by role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Role</SelectItem>
-                                <SelectItem value="Admin">Admin</SelectItem>
-                                <SelectItem value="Admin 2">Admin 2</SelectItem>
-                            </SelectContent>
-                        </Select> */}
+                        <div className="flex flex-row gap-4">
+                            <div className="flex flex-col w-fit">
+                                <Select
+                                    defaultValue={selectedYear}
+                                    onValueChange={(value) => setSelectedYear(value)}
+                                >
+                                    <Label className="mb-2 pl-1">
+                                        Tahun
+                                    </Label>
+                                    <SelectTrigger className="max-w-[80px]">
+                                        <SelectValue placeholder="Filter by Year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({ length: 10 }, (_, i) => (
+                                            <SelectItem key={i} value={String((thisYear + 1) - i)}>
+                                                {(thisYear + 1) - i}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col w-fit">
+                                <Select
+                                    onValueChange={(value) => setSelectedUnit(value)}
+                                    defaultValue={selectedUnit}
+                                >
+                                    <Label className="mb-2 pl-1">
+                                        Indikator Kinerja
+                                    </Label>
+                                    <SelectTrigger className="wfit">
+                                        <SelectValue placeholder="Filter by Indicator" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Semua Indikator</SelectItem>
+                                        {indicators?.map((unit: any) => (
+                                            <SelectItem key={unit.id} value={unit.id}>
+                                                {unit.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                    <Link href={"/mata-anggaran/new"}>
-                        <Button variant={"default"} className="bg-green-500">
-                            <Plus /> Tambah Mata Anggaran
-                        </Button>
-                    </Link>
+                <Link href={"/mata-anggaran/new"}>
+                    <Button variant={"default"} className="bg-green-500">
+                        <Plus /> Tambah Mata Anggaran
+                    </Button>
+                </Link>
             </div>
 
 

@@ -33,10 +33,7 @@ import { useEffect, useState } from "react";
 import { Indicator, SubUnit, Unit } from "@/lib/types";
 
 export default function DetailIndicatorContent({ id }: { id: string }) {
-    const { userInfo } = useSelector((state: RootState) => state.auth)
     const [indicator, setIndicator] = useState<Indicator>();
-    const [units, setUnit] = useState<Unit[]>([]);
-    const [subUnits, setSubUnit] = useState<SubUnit[]>([]);
     const router = useRouter();
     const thisYear = new Date().getFullYear() + 1
     const formSchema = z.object({
@@ -49,17 +46,21 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
         sifat: z.string({
             required_error: "Sifat KPI harus diisi"
         }),
-        baseline: z.string({
-            required_error: "Baseline KPI harus diisi"
-        }),
-        target: z.string({
-            required_error: "Target KPI harus diisi"
-        }),
         year: z.string({
             required_error: "Tahun KPI harus diisi"
         }),
-        units: z.array(z.string()).optional(),
-        subUnits: z.array(z.string()).optional(),
+        bidangId: z.string({
+            required_error: "Bidang KPI harus diisi"
+        }),
+        primaryPICId: z.string({
+            required_error: "PIC Utama KPI harus diisi"
+        }),
+        standard: z.string({
+            required_error: "Standar KPI harus diisi"
+        }).optional(),
+        baseline: z.string().optional(),
+        target: z.string().optional(),
+        secondaryPICId: z.string().optional(),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -68,15 +69,18 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
             kpiCode: indicator?.kpiCode ?? "",
             name: indicator?.name ?? "",
             sifat: indicator?.sifat ?? "",
+            year: indicator?.tahun ?? "",
+            bidangId: indicator?.bidang.id ?? "",
+            primaryPICId: indicator?.primary_pic_id ?? "",
+            secondaryPICId: indicator?.secondary_pic_id ?? "",
+            standard: indicator?.standard ?? "",
             baseline: indicator?.baseline ?? "",
             target: indicator?.target ?? "",
-            year: indicator?.year ?? thisYear.toString(),
-            units: [],
-            subUnits: [],
         },
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log(values)
         try {
             toast.promise(
                 axios.put(`${BASE_URL}/indicator/${id}`, values, {
@@ -101,34 +105,6 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
     }
 
     useEffect(() => {
-        const fetchDataUnit = async () => {
-            try {
-
-                const response = await axios.get(`${BASE_URL}/unit`, {
-                    withCredentials: true
-                })
-                if (response.status === 200) {
-                    setUnit(response.data.data)
-                }
-                return response.data;
-            } catch (error) {
-                return error;
-            }
-        };
-        const fetchDataSubUnit = async () => {
-            try {
-
-                const response = await axios.get(`${BASE_URL}/sub-unit`, {
-                    withCredentials: true
-                })
-                if (response.status === 200) {
-                    setSubUnit(response.data.data)
-                }
-                return response.data;
-            } catch (error) {
-                return error;
-            }
-        };
         const fetchDataIndicator = async () => {
             try {
 
@@ -137,14 +113,16 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                 })
                 if (response.status === 200) {
                     setIndicator(response.data.data)
-                    form.setValue('kpiCode', response.data.data.kpiCode)
-                    form.setValue('name', response.data.data.name)
-                    form.setValue('sifat', response.data.data.sifat)
-                    form.setValue('baseline', response.data.data.baseline)
-                    form.setValue('target', response.data.data.target)
-                    form.setValue('year', response.data.data.year)
-                    form.setValue('units', response.data.data.units.map((unit: Unit) => unit.id))
-                    form.setValue('subUnits', response.data.data.sub_units.map((subUnit: SubUnit) => subUnit.id))
+                    form.setValue('kpiCode', response.data.data.kpiCode ?? undefined)
+                    form.setValue('name', response.data.data.name ?? undefined)
+                    form.setValue('sifat', response.data.data.sifat ?? undefined)
+                    form.setValue('baseline', response.data.data.baseline ?? undefined)
+                    form.setValue('target', response.data.data.target ?? undefined)
+                    form.setValue('year', response.data.data.tahun ?? undefined)
+                    form.setValue('standard', response.data.data.standard ?? undefined)
+                    form.setValue('bidangId', response.data.data.bidang.id ?? undefined)
+                    form.setValue('primaryPICId', response.data.data.primary_pic_id ?? undefined)
+                    form.setValue('secondaryPICId', response.data.data.secondary_pic_id ?? undefined)
                 }
                 return response.data;
             } catch (error) {
@@ -152,8 +130,6 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
             }
         };
 
-        fetchDataUnit();
-        fetchDataSubUnit();
         fetchDataIndicator()
     }, [id, form])
 
@@ -171,7 +147,7 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Tahun</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value} defaultValue={indicator?.year}>
+                                                <Select disabled onValueChange={field.onChange} value={field.value} defaultValue={indicator?.year}>
                                                     <FormControl>
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Tahun" />
@@ -196,7 +172,7 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                                             <FormItem>
                                                 <FormLabel>Kode Indikator Kinerja</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="0.0" {...field} defaultValue={indicator?.kpiCode} value={field.value} />
+                                                    <Input disabled placeholder="0.0" {...field} defaultValue={indicator?.kpiCode} value={field.value} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -211,7 +187,7 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                                             <FormItem>
                                                 <FormLabel>Nama Indikator Kinerja</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="nama" {...field} value={field.value} />
+                                                    <Input disabled placeholder="nama" {...field} value={field.value} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -219,12 +195,12 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name="sifat"
+                                        name="standard"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Sifat Indikator Kinerja</FormLabel>
+                                                <FormLabel>Standart Nilai</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Utama/Tambahan" {...field} value={field.value} />
+                                                    <Input placeholder="0" {...field} value={field.value} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -257,7 +233,9 @@ export default function DetailIndicatorContent({ id }: { id: string }) {
                                         )}
                                     />
                                 </div>
-                                <Button type="submit">Submit</Button>
+                                <Button type="submit">
+                                    Simpan
+                                </Button>
                             </form>
                         </Form>
                     </div>

@@ -78,11 +78,11 @@ export function DataTable<TData, TValue>({
                         </Select> */}
                     </div>
                 </div>
-                    <Link href={`/indicator/${id}/ma-to-indicator/${prokerId}/belanja/new`}>
-                        <Button variant={"default"} className="bg-green-500">
-                            <Plus /> Tambah Belanja
-                        </Button>
-                    </Link>
+                <Link href={`/indicator/${id}/ma-to-indicator/${prokerId}/belanja/new`}>
+                    <Button variant={"default"} className="bg-green-500">
+                        <Plus /> Tambah Belanja
+                    </Button>
+                </Link>
             </div>
 
 
@@ -108,18 +108,30 @@ export function DataTable<TData, TValue>({
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
+                            <>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                                <TableRow className="font-bold bg-gray-100">
+                                    <TableCell colSpan={columns.length - 2} className="text-right">
+                                        Total
+                                    </TableCell>
+                                    <TableCell>
+                                        {table.getRowModel().rows.reduce((total, row) => {
+                                            return total + (Number(row.getValue("jumlah")) || 0)
+                                        }, 0).toLocaleString()}
+                                    </TableCell>
                                 </TableRow>
-                            ))
+                            </>
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">

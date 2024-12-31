@@ -29,6 +29,10 @@ import { Rekening } from "@/lib/types"
 
 export const jenisRekeningColumn: ColumnDef<Rekening>[] = [
     {
+        accessorKey: "code",
+        header: "Kode Jenis Rekening",
+    },
+    {
         accessorKey: "name",
         header: "Nama Jenis Rekening",
     },

@@ -28,8 +28,12 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 export default function NewMAtoIndicatorContent({ id }: { id: string }) {
+    const { userInfo } = useSelector((state: RootState) => state.auth);
+    const unit = userInfo?.unitData.length === 1 ? userInfo.unitData[0].id : undefined;
     const [indicator, setIndicator] = useState<Indicator>();
     const thisDate = new Date();
     const nextYear = new Date(thisDate.getFullYear() + 1, thisDate.getMonth(), thisDate.getDate());
@@ -78,7 +82,10 @@ export default function NewMAtoIndicatorContent({ id }: { id: string }) {
     function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             toast.promise(
-                axios.post(`${BASE_URL}/ma-to-indicator/`, values, {
+                axios.post(`${BASE_URL}/ma-to-indicator/`, {
+                    ...values,
+                    unitId: unit
+                }, {
                     withCredentials: true
                 }),
                 {

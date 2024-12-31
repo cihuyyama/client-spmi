@@ -92,8 +92,8 @@ export const bidangColumns: ColumnDef<UserState>[] = [
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem disabled>
-                                <Link href={`/users/${bidang.id}`} className="w-full">
+                            <DropdownMenuItem>
+                                <Link href={`/bidang/${bidang.id}`} className="w-full">
                                     Detail Bidang
                                 </Link>
                             </DropdownMenuItem>

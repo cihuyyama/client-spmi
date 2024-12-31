@@ -22,7 +22,7 @@ import { toast } from "sonner"
 import axios from "axios"
 import { BASE_URL } from "@/constant/BaseURL"
 import { Button } from "@/components/ui/button"
-import { BookText, Eraser, Eye, MoreHorizontal } from "lucide-react"
+import { BookText, Eraser, Eye, MoreHorizontal, Pencil } from "lucide-react"
 import Link from "next/link"
 import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store"
@@ -40,12 +40,25 @@ export const indicatorColumn: ColumnDef<Indicator>[] = [
         header: "Sifat",
     },
     {
+        accessorKey: "standard",
+        header: "Standard",
+    },
+    {
         accessorKey: "baseline",
         header: "Baseline",
     },
     {
         accessorKey: "target",
         header: "Target",
+    },
+    {
+        accessorKey: "MaOnKpi.Pembelian",
+        header: "Jumlah Anggaran (Rupiah)",
+        cell: ({ row }) => {
+            const proker = row.original.MaOnKpi
+            const jumlahAnggaran = proker.reduce((acc, curr) => acc + curr.Pembelian.reduce((acc, curr) => acc + curr.jumlah, 0), 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            return `${jumlahAnggaran}`
+        }
     },
     {
         id: "actions",
@@ -56,38 +69,6 @@ export const indicatorColumn: ColumnDef<Indicator>[] = [
             const decryptedId = Buffer.from(encryptedId, 'base64').toString('ascii')
             const { userInfo } = useSelector((state: RootState) => state.auth);
 
-            const handleDelete = async () => {
-                try {
-                    toast.promise(
-                        axios({
-                            method: 'DELETE',
-                            url: `${BASE_URL}/indicator/${indicator.id}`,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            withCredentials: true,
-                            // Disable automatic response parsing
-                            transformResponse: [(data) => data], // Fetch doesn't auto-parse the response
-                        }),
-                        {
-                            loading: "Deleting indicator...",
-                            success: (data) => {
-                                setTimeout(() => {
-                                    window.location.reload()
-                                }, 300)
-                                return `indicator deleted successfully`
-                            },
-                            error: (e) => {
-                                return `Failed to delete indicator: ${e}`
-                            },
-                        }
-                    )
-                } catch (error: any) {
-                    toast.error(`Failed to delete indicator: ${error.message}`)
-                }
-            }
-
             return (
                 <div>
                     <TooltipProvider>
@@ -96,16 +77,16 @@ export const indicatorColumn: ColumnDef<Indicator>[] = [
                                 <TooltipTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0">
                                         <span className="sr-only">detail</span>
-                                        <Eye className="h-4 w-4" />
+                                        <Pencil className="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
                             </Link>
                             <TooltipContent>
-                                <p>Detail indikator</p>
+                                <p>Edit indikator</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                    {userInfo?.role?.permissions.map(permission => permission.name).includes("VIEW_PROGRAM_KERJA") && (
+                    {/* {userInfo?.role?.permissions.map(permission => permission.name).includes("VIEW_PROGRAM_KERJA") && ( */}
                         <TooltipProvider>
                             <Tooltip>
                                 <Link href={`/indicator/${indicator.id}/ma-to-indicator`}>
@@ -121,45 +102,8 @@ export const indicatorColumn: ColumnDef<Indicator>[] = [
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
-                    )}
+                    {/* )} */}
 
-
-                    <AlertDialog>
-                        <AlertDialogTrigger className="">
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <Link href={`/indicator/${indicator.id}/ma-to-indicator`}>
-                                        <TooltipTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">detail</span>
-                                                <Eraser className="h-4 w-4 text-red-500" />
-                                            </Button>
-                                        </TooltipTrigger>
-                                    </Link>
-                                    <TooltipContent>
-                                        <p>Delete Indikator</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete your data
-                                    and remove your data from our servers.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>
-                                    Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete}>
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
                 </div>
             )
         },

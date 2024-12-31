@@ -17,7 +17,7 @@ export default function RolePage() {
   const { userInfo } = useSelector((state: RootState) => state.auth);
 
   return (
-    <ContentLayout title="Users">
+    <ContentLayout title="Admin Perencanaan">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

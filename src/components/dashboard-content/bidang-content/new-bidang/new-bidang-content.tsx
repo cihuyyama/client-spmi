@@ -14,17 +14,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
-import { useEffect, useState } from "react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import axios from "axios";
 import { BASE_URL } from "@/constant/BaseURL";
@@ -36,16 +25,13 @@ export default function NewBidangContent() {
         name: z.string({
             required_error: "Nama Bidang harus diisi"
         }),
-        code: z.string({
-            required_error: "Kode Bidang harus diisi"
-        }),
+        code: z.string().optional(),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            code: "",
         },
     })
 
@@ -90,20 +76,6 @@ export default function NewBidangContent() {
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Nama Bidang" {...field} value={field.value ?? ""} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="code"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Kode Bidang</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="01" {...field} value={field.value ?? ""} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

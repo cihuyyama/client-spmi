@@ -7,15 +7,12 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
 import { useEffect, useState } from "react";
 import {
     Select,
@@ -24,14 +21,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import axios from "axios";
 import { BASE_URL } from "@/constant/BaseURL";
 import { useRouter } from "next/navigation";
+import { Unit } from "@/lib/types";
+import SelectReact from 'react-select'
 
 export default function NewUserContent() {
     const [roles, setRoles] = useState([])
+    const [units, setUnits] = useState<Unit[]>([])
     const router = useRouter();
     const formSchema = z.object({
         username: z.string({
@@ -41,6 +40,9 @@ export default function NewUserContent() {
             required_error: 'Password is required',
         }).min(6),
         roleId: z.string().nullable().optional(),
+        unitIds: z.array(z.string({
+            required_error: 'Unit ID is required',
+        })).optional(),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -48,7 +50,8 @@ export default function NewUserContent() {
         defaultValues: {
             username: '',
             password: '',
-            roleId: undefined
+            roleId: undefined,
+            unitIds: [],
         },
     })
 
@@ -90,8 +93,22 @@ export default function NewUserContent() {
                 return error;
             }
         };
+        const fetchDataUnit = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/unit`, {
+                    withCredentials: true
+                })
+                if (response.status === 200) {
+                    setUnits(response.data.data)
+                }
+                return response.data;
+            } catch (error) {
+                return error;
+            }
+        };
 
         fetchData();
+        fetchDataUnit();
     }, [])
 
     return (
@@ -101,7 +118,7 @@ export default function NewUserContent() {
                     <div className="flex flex-col relative w-full">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                                <div className="max-w-[400px]">
+                                <div className="max-w-[400px] space-y-4">
                                     <FormField
                                         control={form.control}
                                         name="username"
@@ -153,8 +170,39 @@ export default function NewUserContent() {
                                             </FormItem>
                                         )}
                                     />
+                                    <FormField
+                                        control={form.control}
+                                        name="unitIds"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Unit (Optional)</FormLabel>
+                                                <FormControl>
+                                                    <SelectReact
+                                                        isMulti
+                                                        options={units?.map((unit) => ({
+                                                            value: unit.id,
+                                                            label: unit.name,
+                                                        }))}
+                                                        value={form.getValues('unitIds')?.map((id) => {
+                                                            const unit = units.find((u) => u.id === id);
+                                                            return unit ? { value: unit.id, label: unit.name } : null;
+                                                        })}
+                                                        onChange={(selectedOptions) => {
+                                                            const selectedUnitIds = selectedOptions
+                                                                .filter((option) => option !== null)
+                                                                .map((option) => option!.value);
+                                                            form.setValue('unitIds', selectedUnitIds);
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
-                                <Button type="submit">Submit</Button>
+                                <Button type="submit">
+                                    Simpan
+                                </Button>
                             </form>
                         </Form>
                     </div>

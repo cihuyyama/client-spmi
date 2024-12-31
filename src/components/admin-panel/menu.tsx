@@ -69,8 +69,11 @@ export function Menu({ isOpen }: MenuProps) {
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="mt-8 h-full w-full">
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
-          {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
+          {menuList.map(({ groupLabel, menus, role: groupRole }, index) => (
+            (userInfo?.role?.permissions.map(permission => permission.name).includes(groupRole)
+              || groupRole === "All")
+            &&
+            (<li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
@@ -92,8 +95,12 @@ export function Menu({ isOpen }: MenuProps) {
                 <p className="pb-2"></p>
               )}
               {menus.map(
-                ({ href, label, icon: Icon, active, submenus, role }, index) =>
-                  (userInfo?.role?.permissions.map(permission => permission.name).includes(role) || role==="All") &&
+                ({ href, label, icon: Icon, active, submenus, role, jadwal }, index) =>
+                  (userInfo?.role?.permissions.map(permission => permission.name).includes(role)
+                    || role === "All")
+                  &&
+                  (jadwal === userInfo?.unit[0].Jadwal.name || jadwal === undefined)
+                  &&
                   (
                     submenus.length === 0 ? (
                       <div className="w-full" key={index}>
@@ -145,7 +152,7 @@ export function Menu({ isOpen }: MenuProps) {
                     )
                   )
               )}
-            </li>
+            </li>)
           ))}
 
           <li className="w-full grow flex items-end">

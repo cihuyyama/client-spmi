@@ -12,7 +12,7 @@ import DetailIndicatorContent from "@/components/dashboard-content/indikator-con
 
 export default function DetailIndicatorPage({ params }: { params: { id: string } }) {
   return (
-    <ContentLayout title="New Indicator">
+    <ContentLayout title="Edit Indicator">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

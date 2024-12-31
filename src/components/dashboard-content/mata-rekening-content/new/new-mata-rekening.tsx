@@ -27,9 +27,6 @@ export default function NewMataRekeningContent() {
     const [jenis, setJenis] = useState<JenisRekening[]>();
     const router = useRouter();
     const formSchema = z.object({
-        noRek: z.string({
-            required_error: "Kode Rekening harus diisi"
-        }),
         name: z.string({
             required_error: "Nama Rekening harus diisi"
         }),
@@ -42,7 +39,6 @@ export default function NewMataRekeningContent() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            noRek: undefined,
             name: undefined,
             units: [],
         },
@@ -116,34 +112,6 @@ export default function NewMataRekeningContent() {
                                 <div className="flex flex-row gap-4 w-full">
                                     <FormField
                                         control={form.control}
-                                        name="noRek"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Kode Mata Rekening</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="0.0" {...field} value={field.value} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <div className="w-fit md:min-w-[400px] space-y-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Nama Mata Rekening</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="nama" {...field} value={field.value} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
                                         name="jenisId"
                                         render={({ field }) => (
                                             <FormItem>
@@ -164,7 +132,23 @@ export default function NewMataRekeningContent() {
                                             </FormItem>
                                         )}
                                     />
+                                </div>
+                                <div className="w-fit md:min-w-[400px] space-y-4">
                                     <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Nama Mata Rekening</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="nama" {...field} value={field.value} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* <FormField
                                         control={form.control}
                                         name="units"
                                         render={({ field }) => (
@@ -192,7 +176,7 @@ export default function NewMataRekeningContent() {
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
                                 </div>
                                 <Button type="submit">Submit</Button>
                             </form>

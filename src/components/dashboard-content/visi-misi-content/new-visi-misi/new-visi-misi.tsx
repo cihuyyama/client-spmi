@@ -139,7 +139,7 @@ export default function NewVisiMisiContent() {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
+                                    {/* <FormField
                                         control={form.control}
                                         name="subUnitId"
                                         render={({ field }) => (
@@ -165,7 +165,7 @@ export default function NewVisiMisiContent() {
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
                                     <FormField
                                         control={form.control}
                                         name="tahun"

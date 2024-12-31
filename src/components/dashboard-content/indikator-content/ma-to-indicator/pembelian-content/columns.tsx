@@ -1,14 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal } from "lucide-react"
+import { Eraser, MoreHorizontal, Pencil } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import axios from "axios"
@@ -45,6 +43,36 @@ export const belanjaColumn: ColumnDef<Pembelian>[] = [
         header: "Satuan",
     },
     {
+        accessorKey: "nilaiSatuan",
+        header: "Nilai Satuan (Rupiah)",
+        cell: ({ row }) => {
+            const value = row.getValue("nilaiSatuan");
+            return value 
+                ? `${Number(value).toLocaleString('id-ID', {
+                    maximumFractionDigits: 0,
+                    useGrouping: true
+                }).replace(/,/g, '.')}`
+                : '-'
+        }
+    },
+    {
+        accessorKey: "kuantitas",
+        header: "Kuantitas",
+    },
+    {
+        accessorKey: "jumlah",
+        header: "Jumlah (Rupiah)",
+        cell: ({ row }) => {
+            const value = row.getValue("jumlah");
+            return value 
+                ? `${Number(value).toLocaleString('id-ID', {
+                    maximumFractionDigits: 0,
+                    useGrouping: true
+                }).replace(/,/g, '.')}`
+                : '-'
+        }
+    },
+    {
         id: "actions",
         cell: ({ row }) => {
             const pembelian = row.original
@@ -56,64 +84,75 @@ export const belanjaColumn: ColumnDef<Pembelian>[] = [
                             withCredentials: true,
                         }),
                         {
-                            loading: "Deleting user...",
+                            loading: "Deleting data...",
                             success: () => {
                                 setTimeout(() => {
                                     window.location.reload()
                                 }, 300)
-                                return `User deleted successfully`
+                                return `data deleted successfully`
                             },
                             error: (e) => {
-                                return `Failed to delete user: ${e}`
+                                return `Failed to delete data: ${e}`
                             },
                         }
                     )
                 } catch (error: any) {
-                    toast.error(`Failed to delete user: ${error.message}`)
+                    toast.error(`Failed to delete data: ${error.message}`)
                 }
             }
 
             return (
-                <AlertDialog>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>
-                                <Link href={`/indicator/${pembelian.ma_id}/ma-to-indicator`} className="w-full">
-                                    Detail Pembelian
-                                </Link>
-                            </DropdownMenuItem>
-                            <AlertDialogTrigger className="w-full">
-                                <DropdownMenuItem>
-                                    Delete Mata Anggaran Dari Indikator
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your data
-                                and remove your data from our servers.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>
-                                Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>
-                                Continue
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                <div>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <Link href={`/indicator/${pembelian.ma_to_indicator.kpiId}/ma-to-indicator/${pembelian.ma_to_indicator.id}/belanja/${pembelian.id}`}>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">belanja</span>
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                            </Link>
+                            <TooltipContent>
+                                <p>Detail Belanja</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <AlertDialog>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <AlertDialogTrigger>
+                                    <TooltipTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0 text-red-500">
+                                        <span className="sr-only">belanja</span>
+                                        <Eraser className="h-4 w-4" />
+                                    </Button>
+                                    </TooltipTrigger>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently delete your data
+                                            and remove your data from our servers.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleDelete}>
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                                <TooltipContent>
+                                    <p>Delete Belanja</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </AlertDialog>
+                </div>
             )
         },
     },

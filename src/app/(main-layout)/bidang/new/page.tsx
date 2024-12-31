@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import NewBidangContent from "@/components/dashboard-content/bidang-content/new-bidang/new-bidang-content";
 
-export default function UserDetailPage({ params }: { params: { id: string } }) {
+export default function BidangNewPage({ params }: { params: { id: string } }) {
     const { userInfo } = useSelector((state: RootState) => state.auth);
 
     return (

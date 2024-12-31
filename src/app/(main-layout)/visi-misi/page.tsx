@@ -17,7 +17,7 @@ export default function VisiMisiPage() {
   const { userInfo } = useSelector((state: RootState) => state.auth);
 
   return (
-    <ContentLayout title="Penyusunan Anggaran">
+    <ContentLayout title="Penyusunan Program Kerja">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

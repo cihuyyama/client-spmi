@@ -12,7 +12,7 @@ import PembelianContent from "@/components/dashboard-content/indikator-content/m
 
 export default function PembelianPage({ params }: { params: { id: string, prokerId: string } }) {
   return (
-    <ContentLayout title="Penyusunan Anggaran">
+    <ContentLayout title="Penyusunan Program Kerja">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
