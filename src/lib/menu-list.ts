@@ -12,7 +12,8 @@ import {
   Library,
   Wallet,
   ToyBrick,
-  Pocket
+  Pocket,
+  CircleDollarSign
 } from "lucide-react";
 import path from "path";
 
@@ -157,6 +158,14 @@ export function getMenuList(pathname: string): Group[] {
             },
           ]
         },
+        {
+          href: "/review",
+          label: "Review Program Kerja",
+          active: pathname.includes("/review"),
+          icon: Telescope,
+          role: 'All',
+          submenus: []
+        },
         // {
         //   href: "/pagu",
         //   label: "Pagu Anggaran",
@@ -190,12 +199,48 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/review",
-          label: "Program kerja",
+          label: "Review Program kerja",
           active: pathname.includes("/indicator"),
           icon: ListTodo,
           role: 'All',
           submenus: [],
           jadwal: "review"
+        },
+        {
+          href: "/spp",
+          label: "SPP",
+          active: pathname.includes("/spp"),
+          icon: ListTodo,
+          role: 'All',
+          submenus: [],
+          jadwal: "pencairan"
+        },
+        {
+          href: "/spmu",
+          label: "SPMU",
+          active: pathname.includes("/SPMU"),
+          icon: ListTodo,
+          role: 'All',
+          submenus: [],
+          jadwal: "pencairan"
+        },
+        {
+          href: "/spj/progres",
+          label: "Entry Progres Kegiatan",
+          active: pathname.includes("/progres"),
+          icon: ListTodo,
+          role: 'All',
+          submenus: [],
+          jadwal: "pencairan"
+        },
+        {
+          href: "/spj/entry-spj",
+          label: "Entry SPJ",
+          active: pathname.includes("/entry-spj"),
+          icon: ListTodo,
+          role: 'All',
+          submenus: [],
+          jadwal: "pencairan"
         },
       ]
     },
@@ -209,6 +254,20 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/review"),
           icon: Telescope,
           role: 'All',
+          submenus: []
+        },
+      ]
+    },
+    {
+      groupLabel: "Admin Keuangan",
+      role: 'ADMIN_KEUANGAN',
+      menus: [
+        {
+          href: "/jadwal-pencairan",
+          label: "Jadwal Pencairan",
+          active: pathname.includes("/jadwal-pencairan"),
+          icon: LayoutGrid,
+          role: 'ADMIN_KEUANGAN',
           submenus: []
         },
       ]

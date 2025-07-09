@@ -21,7 +21,7 @@ export default function ReviewPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userInfo?.unit[0].Jadwal.name != 'review' && userInfo?.role?.permissions.map((p) => p.name).includes('ADMIN_UNIT') && userInfo?.role?.permissions.length == 1) {
+    if (userInfo?.unit[0]?.Jadwal[0]?.name != 'review' && userInfo?.role?.permissions.map((p) => p.name).includes('ADMIN_UNIT') && userInfo?.role?.permissions.length == 1) {
       window.location.href = '/dashboard';
       toast.info('Anda tidak memiliki akses ke halaman ini');
     }

@@ -20,13 +20,14 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store'
 import { Indicator } from '@/lib/types'
 
-export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, indicator }: { tahun: string, unitId: string, review: string, tanggapan: string, id?: string, indicator?: Indicator[] }) {
+export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, review2, id, indicator }: { tahun: string, unitId: string, review: string, tanggapan: string, review2: string, id?: string, indicator?: Indicator[] }) {
     const { userInfo } = useSelector((state: RootState) => state.auth);
     const roleReviewer = userInfo?.role?.permissions.map(permission => permission.name).includes("REVIEWER")
+    const rolePerencana = userInfo?.role?.permissions.map(permission => permission.name).includes("ADMIN_PERENCANAAN")
     let checkSarandanTemuan: number[] = [];
     indicator?.map((kpi)=> {
         kpi.MaOnKpi.map((proker)=> {
-            if ((!proker.ReviewProgram.saran || !proker.ReviewProgram.temuan) ) {
+            if ((!proker.ReviewProgram?.saran || !proker.ReviewProgram?.temuan) ) {
                 checkSarandanTemuan.push(1)
             } else {
                 checkSarandanTemuan.push(1)
@@ -42,11 +43,14 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
         unitId: z.string({
             required_error: "Unit Id is required"
         }),
-        reviewUmun: z.string({
+        reviewUmum: z.string({
             required_error: "Review Umum is required"
         }).optional(),
         tanggapanAkhir: z.string({
             required_error: "Tanggapan Akhir is required"
+        }).optional(),
+        reviewUmum2: z.string({
+            required_error: "Review Umum is required"
         }).optional(),
     })
 
@@ -55,8 +59,9 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
         defaultValues: {
             tahun: tahun,
             unitId: unitId,
-            reviewUmun: "",
+            reviewUmum: "",
             tanggapanAkhir: "",
+            reviewUmum2: "",
         },
     })
 
@@ -86,9 +91,10 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
     useEffect(() => {
         form.setValue("tahun", tahun)
         form.setValue("unitId", unitId)
-        form.setValue("reviewUmun", review)
+        form.setValue("reviewUmum", review)
         form.setValue("tanggapanAkhir", tanggapan)
-    }, [form, tahun, unitId, review, tanggapan])
+        form.setValue("reviewUmum2", review2)
+    }, [form, tahun, unitId, review, tanggapan, review2])
     return (
         <>
             <h1 className="text-xl font-semibold">
@@ -99,12 +105,12 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
                     <div className="w-full md:min-w-[400px] space-y-4 mt-4">
                         <FormField
                             control={form.control}
-                            name="reviewUmun"
+                            name="reviewUmum"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Hasil Review</FormLabel>
                                     <FormControl>
-                                        <Textarea placeholder="review" {...field} disabled={!roleReviewer} value={field.value} />
+                                        <Textarea {...field} disabled={!roleReviewer && !rolePerencana} value={field.value} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -118,13 +124,25 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
                                     <FormLabel>Tanggapan Unit Kerja</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="tanggapan"
                                             {...field}
                                             value={field.value}
                                             disabled={
-                                                roleReviewer
+                                                roleReviewer && !rolePerencana
                                             }
                                         />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="reviewUmum2"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Hasil Review 2</FormLabel>
+                                    <FormControl>
+                                        <Textarea {...field} disabled={!roleReviewer && !rolePerencana} value={field.value} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -134,16 +152,16 @@ export default function HasilReviewUmum({ tahun, unitId, review, tanggapan, id, 
                     <Button
                         type="submit"
                         disabled={
-                            userInfo?.unit[0].Jadwal.name != 'review'
+                            userInfo?.unit[0]?.Jadwal[0]?.name != 'review' && (!roleReviewer && !rolePerencana)
                         }
                     >
                         Submit
                     </Button>
 
                 </form>
-                {userInfo?.unit[0].Jadwal.name != 'review' && (
+                {userInfo?.unit[0]?.Jadwal[0]?.name != 'review' || (!roleReviewer && !rolePerencana) && (
                     <span className='text-sm font-semibold text-red-400'>
-                        *Anda tidak bisa submit tanggapan karena jadwal review belum dimulai
+                        *Anda tidak bisa submit karena jadwal review belum dimulai
                     </span>
                 )}
             </Form>

@@ -47,7 +47,7 @@ export default function ReviewContent() {
     const fetchDataReview = async () => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/review?jadwalId=${data[0].tahun}&unitId=${selectedUnit}`,
+          `${BASE_URL}/review?tahun=${data[0].tahun}&unitId=${selectedUnit}`,
           { withCredentials: true }
         );
 
@@ -82,24 +82,27 @@ export default function ReviewContent() {
           </div>
         </CardContent>
       </Card>
-      <Card className="rounded-lg border-none mt-6 w-full">
-        <CardContent className="p-6 w-full">
-          <div className="flex justify-center items-start w-full">
-            <div className="flex flex-col relative w-full">
-              <div className="w-full">
-                <HasilReviewUmum
-                  tahun={data[0]?.tahun}
-                  unitId={selectedUnit}
-                  review={review?.reviewUmum ?? ""}
-                  tanggapan={review?.tanggapanAkhir ?? ""}
-                  id={review?.id ?? ""}
-                  indicator={data}
-                />
+      {(
+        <Card className="rounded-lg border-none mt-6 w-full">
+          <CardContent className="p-6 w-full">
+            <div className="flex justify-center items-start w-full">
+              <div className="flex flex-col relative w-full">
+                <div className="w-full">
+                  <HasilReviewUmum
+                    tahun={data[0]?.tahun}
+                    unitId={selectedUnit}
+                    review={review?.reviewUmum ?? ""}
+                    tanggapan={review?.tanggapanAkhir ?? ""}
+                    review2={review?.reviewUmum2 ?? ""}
+                    id={review?.id ?? ""}
+                    indicator={data}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
     </>
   );

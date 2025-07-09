@@ -54,7 +54,8 @@ export default function ReviewProker(
     { reviewProker }: { reviewProker: CreateReviewProgramInput },
 ) {
     const { userInfo } = useSelector((state: RootState) => state.auth);
-    const roleReviewer = userInfo?.role?.permissions.map(permission => permission.name).includes("REVIEWER")
+    const roleReviewer = userInfo?.role?.permissions.map(permission => permission.name).includes("REVIEWER") || userInfo?.role?.permissions.map(permission => permission.name).includes("ADMIN_PERENCANAAN")
+    const rolePerencana = userInfo?.role?.permissions.map(permission => permission.name).includes("ADMIN_PERENCANAAN")
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -94,11 +95,11 @@ export default function ReviewProker(
 
     useEffect(() => {
         form.setValue("prokerId", reviewProker.prokerId)
-        form.setValue("temuan", reviewProker.temuan)
-        form.setValue("saran", reviewProker.saran)
-        form.setValue("tanggapan", reviewProker.tanggapan)
-        form.setValue("reviewAkhir", reviewProker.reviewAkhir)
-        form.setValue("rekomendasi", reviewProker.rekomendasi)
+        form.setValue("temuan", reviewProker?.temuan)
+        form.setValue("saran", reviewProker?.saran)
+        form.setValue("tanggapan", reviewProker?.tanggapan)
+        form.setValue("reviewAkhir", reviewProker?.reviewAkhir)
+        form.setValue("rekomendasi", reviewProker?.rekomendasi)
     }, [form, reviewProker])
     return (
         <>
@@ -144,7 +145,7 @@ export default function ReviewProker(
                                 <FormItem>
                                     <FormLabel>Tanggapan</FormLabel>
                                     <FormControl>
-                                        <Textarea placeholder="" disabled={roleReviewer} {...field} value={field.value} />
+                                        <Textarea placeholder="" disabled={roleReviewer && !rolePerencana} {...field} value={field.value} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

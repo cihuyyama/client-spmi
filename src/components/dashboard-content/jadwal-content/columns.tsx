@@ -37,6 +37,10 @@ export const jadwalColumn: ColumnDef<Jadwal>[] = [
         header: "Tahap",
     },
     {
+        accessorKey: "tahun",
+        header: "Tahun",
+    },
+    {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => {

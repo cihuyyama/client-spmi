@@ -19,7 +19,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import ReactSelect, { GroupBase, OptionsOrGroups } from 'react-select'
 import { toast } from "sonner";
 import axios from "axios";
 import { BASE_URL } from "@/constant/BaseURL";
@@ -36,12 +35,19 @@ import { useEffect, useState } from "react";
 export default function NewJadwalContent() {
     const router = useRouter();
     const [categories, setCategories] = useState<CategoryUnit[]>([]);
+    const nextYear = new Date().getFullYear() + 1
+    const thisMonth = new Date().getMonth()
+    const thisDate = new Date().getDate()
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(nextYear, thisMonth, thisDate));
     const formSchema = z.object({
         unitId: z.array(z.string({
             required_error: "Unit ID harus diisi"
         })),
         name: z.string({
             required_error: "Nama Tahap harus diisi"
+        }),
+        tahun: z.string({
+            required_error: "Tahun harus diisi"
         }),
         dateRange: z.object(
             {
@@ -59,12 +65,14 @@ export default function NewJadwalContent() {
         defaultValues: {
             unitId: [],
             name: undefined,
+            tahun: undefined,
             dateRange: {
                 from: undefined,
                 to: undefined,
             }
         },
     })
+    const tahun = form.watch('tahun')
 
     const handleSelectAllUnits = () => {
         const allUnitIds = categories.flatMap(category =>
@@ -127,6 +135,11 @@ export default function NewJadwalContent() {
         fetchDataUnit();
     }, []);
 
+    useEffect(() => {
+        if (!form.getValues('tahun')) return
+        setSelectedDate(new Date(Number(tahun), thisMonth, thisDate))
+    }, [form, tahun, thisMonth, thisDate])
+
     return (
         <Card className="rounded-lg border-none mt-6 w-full">
             <CardContent className="p-6 w-full">
@@ -137,10 +150,34 @@ export default function NewJadwalContent() {
                                 <div className="flex flex-row gap-4 w-full">
                                     <FormField
                                         control={form.control}
-                                        name="name"
+                                        name="tahun"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Tahun</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Tahun" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {
+                                                            Array.from({ length: 5 }, (_, i) => (
+                                                                <SelectItem key={i} value={`${nextYear - i}`}>{nextYear - i}</SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tahap</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -196,7 +233,7 @@ export default function NewJadwalContent() {
                                                         <Calendar
                                                             initialFocus
                                                             mode="range"
-                                                            defaultMonth={field.value.from}
+                                                            defaultMonth={selectedDate}
                                                             selected={{
                                                                 from: field.value.from!,
                                                                 to: field.value.to,

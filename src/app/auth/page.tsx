@@ -12,6 +12,7 @@ import { userLogin } from '@/lib/features/auth/authActions';
 import { AppDispatch } from '@/lib/store';
 import { useForm } from 'react-hook-form';
 import { updateUser } from '@/lib/features/auth/authSlice';
+import Image from 'next/image';
 
 const AuthPage = () => {
     const router = useRouter();
@@ -98,7 +99,7 @@ const AuthPage = () => {
                 <div className="md:w-full px-8 md:px-16">
                     <h2 className="font-bold text-3xl text-[#002D74]">Login</h2>
                     <p className="text-s mt-2 text-[#002D74]">
-                        SIM SPMI UMY
+                        SIM SPMI
                     </p>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

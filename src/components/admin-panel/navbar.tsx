@@ -18,8 +18,7 @@ interface NavbarProps {
 export function Navbar({ title }: NavbarProps) {
   const { userInfo } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
-  const startDate = new Date(userInfo?.unit[0].Jadwal.startDate ?? '');
-  const endDateString = userInfo?.unit[0].Jadwal.endDate ?? '';
+  const endDateString = userInfo?.unit[0]?.Jadwal[0]?.endDate ?? '';
   const endDate = new Date(endDateString);
   const formattedEndDate = endDate.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' });
   const exceedsEndDate = new Date().getTime() > endDate.getTime();
@@ -57,7 +56,7 @@ export function Navbar({ title }: NavbarProps) {
         <div className="flex flex-1 items-center space-x-2 justify-end">
           {userInfo && (
             <div className="flex items-center space-x-2">
-              {userInfo.unit[0].Jadwal && userInfo.role?.permissions[0].name === "ADMIN_UNIT" && userInfo.role.permissions.length == 1 && (
+              {userInfo?.unit[0]?.Jadwal && userInfo.role?.permissions[0].name === "ADMIN_UNIT" && userInfo.role.permissions.length == 1 && (
                 <div className="flex flex-row justify-center items-center gap-2">
                   <div className="flex flex-col">
                     <span className="text-[11px] font-bold">
@@ -65,7 +64,7 @@ export function Navbar({ title }: NavbarProps) {
                     </span>
                     <span className="text-sm">
                       <Badge>
-                        {userInfo.unit[0].Jadwal.name}
+                        {userInfo?.unit[0]?.Jadwal[0]?.name}
                       </Badge>
                     </span>
                   </div>

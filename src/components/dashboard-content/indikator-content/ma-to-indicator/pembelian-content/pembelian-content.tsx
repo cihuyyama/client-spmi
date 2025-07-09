@@ -94,7 +94,7 @@ export default function PembelianContent({ id, prokerId }: { id: string, prokerI
               <div className="w-full flex flex-row mt-4 justify-end text-sm">
                 <div className="flex flex-row">
                   <span>
-                    <span className="font-semibold">{`Pagu Anggaran : `}</span>{pagu?.pagu.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                    <span className="font-semibold">{`Pagu Anggaran : `}</span>{pagu?.pagu?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
                   </span>
                 </div>
                 <Separator orientation="vertical" className="mx-2 w-[2px]" />

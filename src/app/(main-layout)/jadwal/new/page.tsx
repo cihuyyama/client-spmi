@@ -12,7 +12,7 @@ import NewJadwalContent from "@/components/dashboard-content/jadwal-content/new-
 
 export default function NewJadwalPage() {
   return (
-    <ContentLayout title="New Indicator">
+    <ContentLayout title="Master">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

@@ -15,7 +15,8 @@ export interface Unit {
     name: string;
     categoryId: string;
     category_unit: CategoryUnit;
-    Jadwal: Jadwal;
+    PaguAnggaran: PaguAnggaran[];
+    Jadwal: Jadwal[];
     bidangId: string;
     createdAt: string;
     updatedAt: string;
@@ -121,19 +122,41 @@ export interface MataAnggaran {
     created_by?: string
 }
 
+export interface Files {
+    id: string
+    filename: string
+    originalName: number
+    size: string
+    path: string
+    extension: string
+    createdAt: string
+    updatedAt: string
+}
+
 export interface MatoIndicator {
     id: string
     kpiId: string
     uraian: string
     output: string
+    anggaran: number
+    telahDiterima: number
+    anggaranDiminta: number
     startDate: string
     endDate: string
     createdAt: string
     updatedAt: string
     MA: MataAnggaran
     KPI: Indicator
+    Unit: Unit
+    statusBiroKeu: boolean
     Pembelian: Pembelian[]
     ReviewProgram: ReviewProgram
+    ProgresSpj?: EntryProgres
+    SPJ?: SPJ
+    SPP?: SPP
+    dokumenPersiapan: Files[]
+    dokumenPelaksanaan: Files[]
+    dokumenLaporan: Files[]
 }
 
 export interface Rekening {
@@ -184,6 +207,7 @@ export interface Bidang {
 export interface Jadwal {
     id: string
     name: string
+    tahun: string
     startDate: string
     endDate: string
     createdAt: string
@@ -196,6 +220,7 @@ export interface Review {
     unit: Unit
     reviewUmum: string
     tanggapanAkhir: string
+    reviewUmum2: string
     createdAt: string
     updatedAt: string
 }
@@ -214,7 +239,7 @@ export interface ReviewProgram {
 }
 
 export interface PaguAnggaran {
-    id : string
+    id: string
     tahun: string
     unit: Unit
     pagu: string
@@ -223,4 +248,101 @@ export interface PaguAnggaran {
     createdAt: string
     updatedAt: string
     Pembelian: Pembelian[]
+}
+
+export interface PeriodeSPMU {
+    id: string
+    jadwalPencairanId: string
+    periode: string
+    startDatePengajuan: string
+    endDatePengajuan: string
+    createdAt: string
+    updatedAt: string
+    JadwalPencairan: JadwalPencairan
+    SPP: SPP
+}
+
+export interface JadwalPencairan {
+    id: string
+    tahun: string
+    unitId: string
+    batasKegiatan?: string
+    tunggakanSPJ?: string
+    createdAt: string
+    updatedAt: string
+    unit: Unit
+    PeriodeSPMU: PeriodeSPMU[]
+}
+
+export interface SPP {
+    id: string
+    noSpp: string
+    otorisasi: boolean
+    status: boolean
+    tahun: string
+    periodeSPMUId: string
+    createdAt: string
+    updatedAt: string
+    created_by?: string
+    MaOnKpi: MatoIndicator[]
+    SPMU: SPMU
+}
+
+export interface SPMU {
+    id: string
+    noSpmu: string
+    periodeSPMUId: string
+    tahun: string
+    periode: PeriodeSPMU
+    status: string
+    tanggal: string
+    biroApproval: boolean
+    wr2Approval: boolean
+    createdAt: string
+    updatedAt: string
+    spp: SPP
+    created_by?: string
+}
+
+export interface EntryProgres {
+    id: string;
+    prokerId: string;
+
+    statusKegiatan?: string;
+    persenKegiatan?: number;
+    uraianKegiatan?: string;
+    realisasiOutputKegiatan?: string;
+    statusDiperbaiki?: boolean;
+
+    statusPenilaianBPM?: string;
+    persenPenilaianBPM?: number;
+    uraianPenilaianBPM?: string;
+    realisasiOutputBPM?: string;
+    statusApprovalBPM?: string;
+
+    createdAt: string;
+    updatedAt: string;
+
+    proker: MatoIndicator;
+}
+
+export interface SPJ {
+    id: string
+    prokerId: string
+
+    noSPJ: string
+    nominalSPJ: number
+
+    statusPersetujuanBiro: string
+    keteranganBiro: string
+    tanggalApprovalBiro: string
+
+    statusPersetujuanBPM: string
+    keteranganBPM: string
+    tanggalApprovalBPM: string
+
+    createdAt: string
+    updatedAt: string
+
+    proker: MatoIndicator;
 }

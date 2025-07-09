@@ -36,6 +36,10 @@ export const indicatorColumn: ColumnDef<Indicator>[] = [
         header: "Nama Indikator Kinerja",
     },
     {
+        accessorKey: "kpiCode",
+        header: "Kode Indikator",
+    },
+    {
         accessorKey: "sifat",
         header: "Sifat",
     },

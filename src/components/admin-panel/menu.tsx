@@ -99,7 +99,7 @@ export function Menu({ isOpen }: MenuProps) {
                   (userInfo?.role?.permissions.map(permission => permission.name).includes(role)
                     || role === "All")
                   &&
-                  (jadwal === userInfo?.unit[0].Jadwal.name || jadwal === undefined)
+                  (jadwal === userInfo?.unit[0]?.Jadwal[0]?.name || jadwal === undefined)
                   &&
                   (
                     submenus.length === 0 ? (
