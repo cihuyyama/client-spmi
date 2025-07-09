@@ -84,6 +84,7 @@ export interface Indicator {
     jadwal: Jadwal;
     year: string;
     bidang: Bidang;
+    Laporan?: Laporan[];
     MaOnKpi: MatoIndicator[];
     ma: MataAnggaran[];
     primary_pic: Unit
@@ -345,4 +346,32 @@ export interface SPJ {
     updatedAt: string
 
     proker: MatoIndicator;
+}
+
+export interface Laporan {
+    FileLaporan: any;
+    id: string
+    indikatorId: string
+    capaian: number
+    capaian_auditor: number
+    kendala: string
+    perbaikan: string
+    rtl: string
+    pic: string
+    komentar: string
+    rtl_auditor: string
+    isApproved: boolean
+    indicator: Indicator
+    jadwalLaporan: JadwalLaporan;
+    createdAt: string
+    updatedAt: string
+}
+
+export interface JadwalLaporan {
+    id: string
+    name: string
+    startDate: string
+    endDate: string
+    createdAt: string
+    updatedAt: string
 }

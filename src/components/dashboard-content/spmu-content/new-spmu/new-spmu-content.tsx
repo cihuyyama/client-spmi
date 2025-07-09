@@ -100,7 +100,7 @@ export default function NewSPMUContent({ tahun, periode, unitId }: { tahun: stri
         };
 
         fetchData();
-    }, [tahun, unitId, periode]);
+    }, [tahun, unitId, periode, form]);
     return (
         <Card className="rounded-lg border-none mt-6 w-full">
             <CardContent className="p-6 w-full">

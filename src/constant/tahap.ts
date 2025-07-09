@@ -7,3 +7,8 @@ export const tahap = [
     { value: "pelaporan", label: "Pelaporan" },
     { value: "audit", label: "Audit" },
 ]
+
+export const tahapLaporan = [
+    { value: "laporan", label: "Laporan" },
+    
+]

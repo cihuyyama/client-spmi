@@ -13,7 +13,8 @@ import {
   Wallet,
   ToyBrick,
   Pocket,
-  CircleDollarSign
+  CircleDollarSign,
+  Proportions
 } from "lucide-react";
 import path from "path";
 
@@ -105,6 +106,14 @@ export function getMenuList(pathname: string): Group[] {
           role: 'All',
           submenus: []
         },
+        // {
+        //   href: "/jadwal-laporan",
+        //   label: "Jadwal Laporan",
+        //   active: pathname.includes("/jadwal-laporan"),
+        //   icon: LayoutGrid,
+        //   role: 'All',
+        //   submenus: [],
+        // },
         {
           href: "/bidang",
           label: "Bidang",
@@ -242,6 +251,15 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [],
           jadwal: "pencairan"
         },
+        {
+          href: "/laporan",
+          label: "Laporan",
+          active: pathname.includes("/laporan"),
+          icon: Proportions,
+          role: 'All',
+          submenus: [],
+          jadwal: "pelaporan"
+        },
       ]
     },
     {
@@ -268,6 +286,20 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/jadwal-pencairan"),
           icon: LayoutGrid,
           role: 'ADMIN_KEUANGAN',
+          submenus: []
+        },
+      ]
+    },
+    {
+      groupLabel: "Laporan",
+      role: 'ASSESOR_AUDIT',
+      menus: [
+        {
+          href: "/laporan",
+          label: "Laporan",
+          active: pathname.includes("/laporan"),
+          icon: Proportions,
+          role: 'All',
           submenus: []
         },
       ]
