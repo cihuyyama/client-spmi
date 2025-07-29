@@ -14,7 +14,9 @@ import {
   ToyBrick,
   Pocket,
   CircleDollarSign,
-  Proportions
+  Proportions,
+  FileText,
+  ScrollText
 } from "lucide-react";
 import path from "path";
 
@@ -253,8 +255,17 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/laporan",
-          label: "Laporan",
+          label: "Formulir Laporan",
           active: pathname.includes("/laporan"),
+          icon: Proportions,
+          role: 'All',
+          submenus: [],
+          jadwal: "pelaporan"
+        },
+        {
+          href: "/laporan-audit",
+          label: "Laporan Audit",
+          active: pathname.includes("/laporan-audit"),
           icon: Proportions,
           role: 'All',
           submenus: [],
@@ -296,9 +307,17 @@ export function getMenuList(pathname: string): Group[] {
       menus: [
         {
           href: "/laporan",
-          label: "Laporan",
-          active: pathname.includes("/laporan"),
-          icon: Proportions,
+          label: "Formulir Laporan",
+          active: pathname === "/laporan",
+          icon: FileText,
+          role: 'All',
+          submenus: []
+        },
+        {
+          href: "/laporan-audit",
+          label: "Laporan Audit",
+          active: pathname.includes("/laporan-audit"),
+          icon: ScrollText,
           role: 'All',
           submenus: []
         },
