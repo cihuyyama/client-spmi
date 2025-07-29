@@ -34,7 +34,10 @@ export default function DetailLaporanContent({ id }: { id: string }) {
         indikatorId: z.string({
             required_error: "Indikator ID harus diisi",
         }),
-        capaian: z.union([z.string(), z.number()]).optional(),
+        capaian: z.preprocess(
+            (val) => (val === "" ? undefined : Number(val)),
+            z.number({ invalid_type_error: "Capaian harus berupa angka" }).nonnegative().optional()
+        ),
         kendala: z.string({
             required_error: "Kendala harus diisi",
         }),
@@ -144,6 +147,7 @@ export default function DetailLaporanContent({ id }: { id: string }) {
                                     <FormLabel>Capaian Auditor</FormLabel>
                                     <FormControl>
                                         <Input
+                                            type="number"
                                             placeholder="0.0"
                                             {...field}
                                             defaultValue={laporan?.capaian_auditor}
@@ -212,9 +216,11 @@ export default function DetailLaporanContent({ id }: { id: string }) {
                                             <FormLabel>Capaian</FormLabel>
                                             <FormControl>
                                                 <Input
+                                                    type="number"
+                                                    step="any"
                                                     placeholder="0.0"
                                                     {...field}
-                                                    defaultValue={laporan?.capaian}
+                                                    value={field.value ?? ""}
                                                     readOnly={laporan?.isApproved === true || userInfo?.role?.name === "Auditor"}
                                                     className={`${userInfo?.role?.name === "Auditor" ? "bg-gray-200" : ""}`}
                                                 />
