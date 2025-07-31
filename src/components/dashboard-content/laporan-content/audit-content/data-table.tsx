@@ -82,7 +82,7 @@ export function DataTable<TData, TValue>({
                         </Select> */}
                     </div>
                 </div>
-                {userInfo?.role?.name !== "Auditor" && (
+                {userInfo?.role?.name !== "Admin Auditor" && (
                     <Link href={`/laporan/${id}/audit/new?indicatorId=${id}`}>
                         <Button variant={"default"} className="bg-green-500">
                             <Plus /> Tambah Laporan Audit
