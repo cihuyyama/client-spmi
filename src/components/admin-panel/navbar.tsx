@@ -56,7 +56,9 @@ export function Navbar({ title }: NavbarProps) {
         <div className="flex flex-1 items-center space-x-2 justify-end">
           {userInfo && (
             <div className="flex items-center space-x-2">
-              {userInfo?.unit[0]?.Jadwal && userInfo.role?.permissions[0].name === "ADMIN_UNIT" && userInfo.role.permissions.length == 1 && (
+              {
+              // userInfo?.unit[0]?.Jadwal && userInfo.role?.permissions[0].name === "ADMIN_UNIT" && userInfo.role.permissions.length == 1 && 
+              (
                 <div className="flex flex-row justify-center items-center gap-2">
                   <div className="flex flex-col">
                     <span className="text-[11px] font-bold">

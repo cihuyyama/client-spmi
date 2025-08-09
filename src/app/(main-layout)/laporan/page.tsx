@@ -14,7 +14,7 @@ import AdminIndikatorContent from "@/components/dashboard-content/laporan-conten
 export default function LaporanPage() {
 
   return (
-    <ContentLayout title="Laporan">
+    <ContentLayout title="Audit Mutu Internal">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

@@ -1,9 +1,6 @@
 import {
-  Tag,
   Users,
   Settings,
-  Bookmark,
-  SquarePen,
   LayoutGrid,
   LucideIcon,
   Telescope,
@@ -12,13 +9,10 @@ import {
   Library,
   Wallet,
   ToyBrick,
-  Pocket,
-  CircleDollarSign,
   Proportions,
   FileText,
   ScrollText
 } from "lucide-react";
-import path from "path";
 
 
 type Submenu = {
@@ -211,11 +205,20 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/review",
           label: "Review Program kerja",
-          active: pathname.includes("/indicator"),
+          active: pathname.includes("/review"),
           icon: ListTodo,
           role: 'All',
           submenus: [],
           jadwal: "review"
+        },
+        {
+          href: "/indicator",
+          label: "Program kerja",
+          active: pathname.includes("/indicator"),
+          icon: ListTodo,
+          role: 'All',
+          submenus: [],
+          jadwal: "revisi"
         },
         {
           href: "/spp",
@@ -255,7 +258,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/laporan",
-          label: "Formulir Laporan",
+          label: "Form Pengisian AMI",
           active: pathname.includes("/laporan"),
           icon: Proportions,
           role: 'All',
@@ -264,7 +267,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/laporan-audit",
-          label: "Laporan Audit",
+          label: "Laporan AMI",
           active: pathname.includes("/laporan-audit"),
           icon: Proportions,
           role: 'All',
@@ -287,6 +290,7 @@ export function getMenuList(pathname: string): Group[] {
         },
       ]
     },
+    
     {
       groupLabel: "Admin Keuangan",
       role: 'ADMIN_KEUANGAN',
@@ -302,12 +306,12 @@ export function getMenuList(pathname: string): Group[] {
       ]
     },
     {
-      groupLabel: "Laporan",
+      groupLabel: "Audit Mutu Internal",
       role: 'ASSESOR_AUDIT',
       menus: [
         {
           href: "/laporan",
-          label: "Formulir Laporan",
+          label: "Form Pengisian AMI",
           active: pathname === "/laporan",
           icon: FileText,
           role: 'All',
@@ -315,7 +319,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/laporan-audit",
-          label: "Laporan Audit",
+          label: "Laporan AMI",
           active: pathname.includes("/laporan-audit"),
           icon: ScrollText,
           role: 'All',
