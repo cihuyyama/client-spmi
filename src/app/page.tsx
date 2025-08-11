@@ -1,18 +1,32 @@
-import { GetServerSidePropsContext } from "next";
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import axios from 'axios';
+import { BASE_URL } from '@/constant/BaseURL';
 
-export default function HomePage() {
-  return (
-    <div>
+async function checkAuthStatus() {
+  const cookieStore = cookies();
+  const token = cookieStore.get('token');
 
-    </div>
-  );
+  if (!token) {
+    redirect('/auth');
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/auth/login`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
+    
+    if (response.status === 200) {
+      redirect('/dashboard');
+    }
+  } catch (error) {
+    redirect('/auth');
+  }
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  return {
-    redirect: {
-      destination: "/auth",
-      permanent: true,
-    }
-  }
+export default async function HomePage() {
+  await checkAuthStatus();
+  return <div></div>;
 }

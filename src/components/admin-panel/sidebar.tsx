@@ -33,7 +33,7 @@ export function Sidebar() {
         >
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image
-              src="/umpo.png"
+              src="/unipol.png"
               alt="Logo"
               width={24}
               height={24}
